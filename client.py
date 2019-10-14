@@ -139,6 +139,8 @@ seeds = sys.argv[5].split(",")
 mining_starter_machine = seeds[0]
 myAddr = {"ip":myIp, "port":myPort}
 
+random.seed(1570982055 + myPort)
+
 attacker_mchine = "x.x.x.x:0"
 if miner_type == "selfish":
     attacker_mchine = myHostname
@@ -334,6 +336,14 @@ while(True):
     #press enter to print blockchain stats
     inp = input()
     blockchainLock.acquire()
+    if inp == 'r': #release all secret blocks
+        while len(secret_blocks) > 0:
+            block_to_release = secret_blocks.popleft()
+            blockchain.add_block(block_to_release)
+            blockchain.max_depth_block = block_to_release
+            forward(block_to_release.to_bytes())
+        print("all secret blocks released")
+        selfish_miner_state = '0'
     print("mining power utilization", blockchain.get_mining_power_utilization())
     print("fraction of attacker (", attacker_mchine, ") blocks in longest chain", blockchain.get_fraction_of_blocks_in_longest_chain(attacker_mchine))
     print("avg interarrival time in longest chain", blockchain.get_avg_interarrival_in_longest_chain())
